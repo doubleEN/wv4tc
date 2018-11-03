@@ -3,12 +3,11 @@ import os
 import re
 import xml.etree.ElementTree as ET
 import logging
-import sys
 
 logging.basicConfig(level=logging.DEBUG)
 sohu_invalid_count = 0
 sohu_incomplete_count = 0
-sohu_count=0
+url_set=set()
 
 
 def doc_fudan(corpus_path, encoding="gb18030"):
@@ -28,6 +27,12 @@ def doc_fudan(corpus_path, encoding="gb18030"):
 
 
 def doc_easenet(corpus_path, encoding="utf8"):
+    """
+    网易文本分类语料解析
+    :param corpus_path:corpus路径
+    :param encoding:解码
+    :return:content\tlabel
+    """
     if not os.path.exists(corpus_path):
         logging.error("corpus_path 无效")
         return
@@ -45,12 +50,11 @@ def parse_sohu_xml(xml_str):
     :param xml_str:doc
     :return:title\ncontent\tlabel
     """
-    global sohu_invalid_count, sohu_incomplete_count,sohu_count
-    sohu_count+=1
+    global sohu_invalid_count, sohu_incomplete_count
     try:
         root = ET.fromstring(xml_str)
     except Exception:
-        sohu_invalid_count+=1
+        sohu_invalid_count += 1
         logging.error(xml_str + "<>不能被正确解析.1")
         return
     url = root.findall("url")
@@ -62,11 +66,20 @@ def parse_sohu_xml(xml_str):
         sohu_incomplete_count += 1
         return
     matches = re.search("//(.*?)\\.sohu\\.com", url[0].text)
+    url_match = re.search("^(.*?)\\.com", url[0].text)
+    url_set.add(url_match[1])
     label = matches[1]
     return contenttitle[0].text + "\n" + content[0].text + "\t" + label
 
 
 def doc_sohu(corpus_path, encoding="gb18030", parser=parse_sohu_xml):
+    """
+    搜狐xml文本解析
+    :param corpus_path:corpus路径
+    :param encoding:解码
+    :param parser:xml解析器
+    :return:去xml格式的纯文本内容
+    """
     doc_xml = ""
     for line in open(corpus_path, "r", encoding=encoding):
         line = line.strip()
@@ -83,6 +96,11 @@ def doc_sohu(corpus_path, encoding="gb18030", parser=parse_sohu_xml):
 def format_doc(corpus_generator, corpus_path, out_path, r_encoding, w_encoding="utf-8"):
     """
     加载原始语料成固定的文件目录格式[content\tlabel]
+    :param corpus_generator: 语料访问生成器
+    :param corpus_path:语料路径
+    :param out_path:输入路径
+    :param r_encoding:解码方式
+    :param w_encoding:编码方式
     """
     if out_path and not w_encoding or not out_path and w_encoding:
         logging.error("参数 out_path、w_encoding 形式不合法。")
@@ -101,19 +119,3 @@ def format_doc(corpus_generator, corpus_path, out_path, r_encoding, w_encoding="
 
     logging.debug(corpus_path + "格式化完成，共计文本数" + str(text_sum - 1))
 
-
-if __name__ == "__main__":
-    # 复旦
-    # format_doc(doc_fudan,"H:\\data-ai\\tc-fudan\\train", "H:\\corpus\\origin\\fudan\\train", "gb18030", "utf8")
-    # format_doc(doc_fudan,"H:\\data-ai\\tc-fudan\\answer", "H:\\corpus\\origin\\fudan\\test", "gb18030", "utf8")
-
-    # 网易
-    # format_doc(doc_easenet, "H:\\data-ai\\tc-wangyi\\corpus_6_4000", "H:\\corpus\\origin\\easenet", "utf8", "utf8")
-
-    # 搜狐
-    # format_doc(doc_sohu, "H:\\data-ai\\tc-souhu\\souhu2012\\news_sohusite_xml.utf8", "H:\\corpus\\origin\\sohu", "utf8")
-    # logging.info("sohu不完整文本数："+str(sohu_incomplete_count))
-    # logging.info("sohu无效文本数："+str(sohu_invalid_count))
-    # logging.info("sohu全部文本数："+str(sohu_count))
-    # 共计文本数1145326,不完整文本数：87414,无效文本数：179256，有效文本数量：878656，23.28%
-    pass
