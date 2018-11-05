@@ -8,6 +8,12 @@
 
 ### 数据清理
 #### easenet
+| corpus      | original_size(doc)      |
+| ----------: |:-------------: |
+| fudan       | 19636          |
+| easenet     | 24000          |
+| sohu        | 1298155(valid) |
+
 | Auto | Culture | Economy | Medicine | Military | Sports |
 | ---: | :-------: | :-------: | :--------: | :------- : | :------: |
 | 4000 | 4000     | 4000     | 4000     | 4000      | 4000   |
