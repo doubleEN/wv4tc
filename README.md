@@ -18,7 +18,7 @@
 
 | Agriculture | Art   | Computer  | Economy  | Enviornment    | Politics    |Space    |Sports    |
 | --------: |:--------: |:-------: |:--------: |:----------: |:--------: |:--------: |:--------: |
-| 2043      | 1482      | 2715     | 3201      | 2435        | 2050      |1282      |2507      |
+|    2043   | 1482      | 2715     | 3201      | 2435        | 2050      |1282      |2507      |
 
 #### sohu
 | Auto | Edu   | Ent  | Economy  | Health    | IT   |Sports    |
