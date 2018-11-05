@@ -32,3 +32,10 @@ def dbc2sbc(str):
             inside_code += 65248
         rstr += chr(inside_code)
     return rstr
+
+def load_SC(path="../data/SpecialCharacter"):
+    sc_set=set()
+    for c in open(path,"r",encoding="utf8"):
+        sc_set.add(c.strip())
+    return sc_set
+

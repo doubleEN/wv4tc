@@ -1,19 +1,30 @@
-# -*- coding: UTF-8 -*-
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+# author:jxm_2@hotmail.com
+# datetime:2018/11/1
+
+
 import os
 import re
 import logging
-from wv4tc.utils import sbc2dbc
+from wv4tc.utils import *
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 sohu_invalid_count = 0
+sohu_sum = 0
+valid_count = 0
 
 
 def clean_text(text):
     """
-    清理文本中的制表符、换行符，全角转半角
+    清理文本中的制表符、换行符，全角转半角，去掉特殊字符。
     """
     text = text.replace("\t", " ")
     text = text.replace("\n", "")
+    sc_set = load_SC()
+    for c in sc_set:
+        text = text.replace(c, "")
     return sbc2dbc(text)
 
 
@@ -57,8 +68,8 @@ def parse_sohu_xml(xml_str):
     :param xml_str:doc
     :return:title\tcontent\tlabel
     """
-    global sohu_invalid_count
-
+    global sohu_invalid_count, sohu_sum
+    sohu_sum += 1
     label_match = re.search("//(.*?)\\.sohu\\.com", xml_str)
     if label_match is None or label_match.group(1).strip() == "":
         logging.info(xml_str + "#### label 无法被解析")
@@ -116,11 +127,11 @@ def format_doc(corpus_generator, corpus_path, out_path, r_encoding, w_encoding="
     if out_path and not w_encoding or not out_path and w_encoding:
         logging.error("参数 out_path、w_encoding 形式不合法。")
         return
-
-    text_sum = 1
+    global valid_count
     with open(out_path, mode=w_mode, encoding=w_encoding) as fw:
         for doc in corpus_generator(corpus_path, r_encoding):
             fw.write(doc + "\n")
-            text_sum += 1
+            valid_count += 1
+    logging.debug("有效格式化文本数：" + str(valid_count))
 
-    logging.debug(corpus_path + "格式化完成，共计文本数" + str(text_sum - 1))
+
