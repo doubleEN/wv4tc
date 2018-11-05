@@ -34,8 +34,18 @@ def dbc2sbc(str):
     return rstr
 
 def load_SC(path="../data/SpecialCharacter"):
+    """
+    加载特殊字符集
+    """
     sc_set=set()
     for c in open(path,"r",encoding="utf8"):
         sc_set.add(c.strip())
     return sc_set
+
+def load_dict(dict_path,decoding="utf8"):
+    """
+    加载文本词典，文本词典一行一个词，得到词集。
+    """
+    return {word.strip() for word in open(dict_path,"r",encoding=decoding) if not word.startswith("#")}
+
 
