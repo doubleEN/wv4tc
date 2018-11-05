@@ -7,17 +7,17 @@
 | sohu        | 1298155(valid) |
 
 ### 数据清理
-#### easenet
+ easenet
 | Auto | Culture | Economy | Medicine | Military | Sports |
 | ---: | :-------: | :-------: | :--------: | :------- : | :------: |
 | 4000 | 4000     | 4000     | 4000     | 4000      | 4000   |
 
-#### fudan
+ fudan
 | Agriculture | Art | Computer | Economy | Enviornment | Politics | Space | Sports |
 | ----------: | :---: | :--------: | :------:  | :--------- : | :-------: | :---: | :---: |
 | 2043        | 1482 | 2715      | 3201    | 2435        | 2050    | 1282 | 2507 |
 
-#### sohu
+ sohu
 | auto | edu | ent | economy | health | it  | sports |
 | ---: | :---: | :---: | :------:  | :------ : | :---: | :------: |
 | 73087 | 11635 | 22064 | 59880   | 23140   | 20551 | 37211   |
