@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.DEBUG)
 stop_words = load_dict("../data/stopwords.txt")
 
 
-def get_bow(data_path, stopwords, names, content_name, label_name):
+def get_bow(data, stopwords, content_name, label_name):
     """
     加载文本语料，获得doc-term矩阵。
     保留单字符但去掉停用词。
@@ -27,15 +27,13 @@ def get_bow(data_path, stopwords, names, content_name, label_name):
         token_pattern="\w+"
     )
 
-    data = pd.read_table(data_path, sep="\t", header=None, names=names)
     X_mat = count_vec.fit_transform(data[content_name])
-    logging.debug(data_path + " >>> BOW已加载")
     if label_name is None:
         return count_vec, X_mat
     return count_vec, X_mat, data[label_name]
 
 
-def get_tfidf(data_path, stopwords, names, content_name, label_name):
+def get_tfidf(data, stopwords, content_name, label_name):
     """
     加载文本语料为TF-IDF矩阵。
     保留单字符但去掉停用词。
@@ -48,21 +46,17 @@ def get_tfidf(data_path, stopwords, names, content_name, label_name):
         token_pattern="\w+"
     )
 
-    data = pd.read_table(
-        data_path, sep="\t",
-        header=None,
-        names=names
-    )
-    X_mat = count_vec.fit_transform(data[content_name])
-    logging.debug(data_path + " >>> BOW 已加载")
 
-    tf_transformer = TfidfTransformer(
+    X_mat = count_vec.fit_transform(data[content_name])
+
+    tfidf_transformer = TfidfTransformer(
         smooth_idf=True,
     ).fit(X_mat)
-    X_train_tf = tf_transformer.transform(X_mat)
-    logging.debug(data_path + " >>> TF-IDF 已加载")
+    X_train_tf = tfidf_transformer.transform(X_mat)
 
     if label_name is None:
         return count_vec, X_train_tf
     return count_vec, X_train_tf, data[label_name]
+
+
 
