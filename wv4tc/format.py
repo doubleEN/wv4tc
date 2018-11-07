@@ -7,14 +7,14 @@
 
 import os
 import re
+from wv4tc.utils import load_SC,sbc2dbc,dbc2sbc
 import logging
-from wv4tc.utils import *
 
-logging.basicConfig(level=logging.ERROR)
 sohu_invalid_count = 0
 sohu_sum = 0
 valid_count = 0
 
+logging.basicConfig(level=logging.DEBUG)
 
 def clean_text(text):
     """

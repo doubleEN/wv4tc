@@ -5,13 +5,11 @@
 # date:2018/11/5
 # desc:文本特征处理
 
-from wv4tc.utils import *
+from wv4tc.utils import load_dict
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 import pandas as pd
-import logging
 
-logging.basicConfig(level=logging.DEBUG)
 
 stop_words = load_dict("../data/stopwords.txt")
 
