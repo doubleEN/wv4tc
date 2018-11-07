@@ -27,7 +27,7 @@ def tuning(train_path, test_path, model, tuned_parameters, scores, cv=5):
     doc_term, data_X, data_Y = get_bow(all_data, stop_words, content_name="content", label_name="label")
     boundary = len(train_data)
 
-    logging.info("<load " + train_data_path + " and " + test_data_path + ">")
+    logging.info("<load " + train_path + " and " + test_path + ">")
     logging.info("cv:" + str(cv))
     logging.info("tuned_parameters:" + str(tuned_parameters))
     logging.info(type(model))
