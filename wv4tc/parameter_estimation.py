@@ -6,20 +6,17 @@
 # desc:调参并测试
 
 import logging
-from wv4tc.feature_text import get_bow,stop_words
+from wv4tc.feature_text import get_bow, stop_words
 import pandas as pd
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.naive_bayes import MultinomialNB
-from sklearn import svm
-from sklearn.ensemble import RandomForestClassifier
 import xgboost as xgb
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import classification_report
+from sklearn.metrics import *
 
 
-logging.basicConfig(filename="../log/tuning.log",filemode="a",level=logging.INFO)
+def tuning(train_path, test_path, model, tuned_parameters, scores, cv=5, n_jobs=-1, log_name="default.log"):
+    logging.basicConfig(filename="../log/" + log_name, filemode="a", level=logging.INFO)
 
-def tuning(train_path, test_path, model, tuned_parameters, scores, cv=5):
     logging.info("TUNING function.")
     train_data = pd.read_table(train_path, sep="\t", header=None, names=["content", "label"])
     test_data = pd.read_table(test_path, sep="\t", header=None, names=["content", "label"])
@@ -44,7 +41,8 @@ def tuning(train_path, test_path, model, tuned_parameters, scores, cv=5):
             estimator=model,
             param_grid=tuned_parameters,
             cv=cv,
-            scoring=score
+            scoring=score,
+            n_jobs=n_jobs
         )
 
         logging.info("fit...")
@@ -58,6 +56,9 @@ def tuning(train_path, test_path, model, tuned_parameters, scores, cv=5):
 
         logging.info("GridSearchCV test...")
         y_true, y_pred = test_Y, clf.predict(test_X)
-        logging.info(classification_report(y_true, y_pred))
-        logging.info("<<<[tuning end]>>>\n")
 
+        logging.info(precision_recall_fscore_support(y_true, y_pred))
+        logging.info(confusion_matrix(y_true, y_pred))
+        logging.info(classification_report(y_true, y_pred))
+
+        logging.info("<<<[tuning end]>>>\n")
