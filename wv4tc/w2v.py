@@ -45,7 +45,7 @@ class w2v():
         if sentence == None or sentence.strip() == "":
             return 0
         sum_vec = 0.0
-        tokens = sentence.split(sep)
+        tokens = sentence.strip().split(sep)
         for token in tokens:
             sum_vec += self.get_vec(token)
         return sum_vec
