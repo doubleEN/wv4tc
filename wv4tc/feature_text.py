@@ -10,7 +10,6 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 import pandas as pd
 
-
 stop_words = load_dict("../data/stopwords.txt")
 
 
@@ -44,7 +43,6 @@ def get_tfidf(data, stopwords, content_name, label_name):
         token_pattern="\w+"
     )
 
-
     X_mat = count_vec.fit_transform(data[content_name])
 
     tfidf_transformer = TfidfTransformer(
@@ -55,6 +53,3 @@ def get_tfidf(data, stopwords, content_name, label_name):
     if label_name is None:
         return count_vec, X_train_tf
     return count_vec, X_train_tf, data[label_name]
-
-
-

@@ -11,7 +11,7 @@ from sklearn.metrics import classification_report
 from wv4tc.feature_text import get_bow, stop_words
 import pickle
 import os
-
+import jieba
 import logging
 
 log_file = "../log/easenet_test.log"
@@ -92,6 +92,8 @@ def load_model(model_path):
     :param model_path: 模型文件夹路径
     :return: 模型，CountVec
     """
+    if not model_path.endswith("/") or not model_path.endswith("\\"):
+        model_path += "/"
     m_path = model_path + "model.pkl"
     transfer_path = model_path + "transfer.pkl"
     if not os.path.exists(m_path) or not os.path.exists(transfer_path):
@@ -104,17 +106,30 @@ def load_model(model_path):
     return model, transfer
 
 
-def predict(doc, model, transfer, model_path=None):
+def predict(docs, model_path, model=None, transfer=None):
     """
     指定模型进行预测
-    :param doc: 文本数组
+    :param doc: 已分词文本数组
     :param model: 模型
     :param transfer: CountVec
     :param model_path: 序列化模型文件夹路径，默认不加载
     :return: label_pred
     """
     if not model_path:
-        return model.predict(transfer.transform(doc))
+        return model.predict(transfer.transform(docs))
     else:
         model, transfer = load_model(model_path)
-        return model.predict(transfer.transform(doc))
+        return model.predict(transfer.transform(docs))
+
+
+def seg_predict(doc, model_path, model=None, transfer=None):
+    """
+    对字符串文本分词并预测
+    :param doc:a str or a list，待预测的文本
+    """
+    if isinstance(doc, str):
+        doc_arr = [" ".join(jieba.lcut(doc))]
+        return predict(doc_arr, model_path, model=None, transfer=None)
+    if isinstance(doc, list):
+        docs_seg = [" ".join(jieba.lcut(d)) for d in doc]
+        return predict(docs_seg, model_path, model=None, transfer=None)
