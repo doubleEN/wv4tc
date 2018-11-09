@@ -8,15 +8,21 @@
 import logging
 from wv4tc.feature_text import get_bow, stop_words
 import pandas as pd
-import xgboost as xgb
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import *
 
+log_file = "../log/tuning_fudan.log"
 
-def tuning(train_path, test_path, model, tuned_parameters, scores, cv=5, n_jobs=-1, log_name="default.log"):
-    logging.basicConfig(filename="../log/" + log_name, filemode="a", level=logging.INFO)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s  %(filename)s : %(levelname)s  %(message)s',
+    datefmt='%Y-%m-%d %A %H:%M:%S',
+    filename=log_file,
+    filemode='a')
 
+
+def tuning(train_path, test_path, model, tuned_parameters, scores, cv=5, n_jobs=-1):
+    logging.info("---------------------------cut_off_begin--------------------------------")
     logging.info("TUNING function.")
     train_data = pd.read_table(train_path, sep="\t", header=None, names=["content", "label"])
     test_data = pd.read_table(test_path, sep="\t", header=None, names=["content", "label"])
@@ -62,3 +68,4 @@ def tuning(train_path, test_path, model, tuned_parameters, scores, cv=5, n_jobs=
         logging.info(classification_report(y_true, y_pred))
 
         logging.info("<<<[tuning end]>>>\n")
+        logging.info("---------------------------cut_off_end--------------------------------")

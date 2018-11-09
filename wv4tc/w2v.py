@@ -32,5 +32,29 @@ class w2v():
         """
         if word not in self.word_dict:
             print(word + " 不存在于向量词典中")
-            return
+            return 0.0
         return self.w2v_dict[word]
+
+    def sum_vect_sent(self, sentence, sep):
+        """
+        词向量求和得句子向量
+        :param sentence: 句子字符串
+        :param sep: 句子分隔符
+        :return: 句子向量
+        """
+        if sentence == None or sentence.strip() == "":
+            return 0
+        sum_vec = 0.0
+        tokens = sentence.split(sep)
+        for token in tokens:
+            sum_vec += self.get_vec(token)
+        return sum_vec
+
+    def mean_vect_sent(self, sentence, sep):
+        """
+        词向量求均值得句子向量
+        :param sentence: 句子字符串
+        :param sep: 句子分隔符
+        :return: 句子向量
+        """
+        return self.sum_vect_sent(sentence, sep) / len(sentence.strip().split(sep))
