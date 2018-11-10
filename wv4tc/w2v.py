@@ -9,7 +9,7 @@ import logging
 import numpy as np
 
 
-class w2v():
+class word2vec():
     def __init__(self, w2v_path, dim, decoding="utf8"):
         '''
         加载word2vec类型
@@ -35,26 +35,33 @@ class w2v():
             return 0.0
         return self.w2v_dict[word]
 
-    def sum_vect_sent(self, sentence, sep):
+    def sum_vect_sent(self, sentence, sep, stopwords=[]):
         """
         词向量求和得句子向量
         :param sentence: 句子字符串
         :param sep: 句子分隔符
-        :return: 句子向量
+        :return: (句子向量，停用词命中数)
         """
         if sentence == None or sentence.strip() == "":
             return 0
         sum_vec = 0.0
         tokens = sentence.strip().split(sep)
+        stop_count=0
         for token in tokens:
-            sum_vec += self.get_vec(token)
-        return sum_vec
+            if token not in stopwords:
+                sum_vec += self.get_vec(token)
+            else:
+                stop_count+=1
+        return sum_vec,stop_count
 
-    def mean_vect_sent(self, sentence, sep):
+    def mean_vect_sent(self, sentence, sep,stopwords=[]):
         """
         词向量求均值得句子向量
         :param sentence: 句子字符串
         :param sep: 句子分隔符
         :return: 句子向量
         """
-        return self.sum_vect_sent(sentence, sep) / len(sentence.strip().split(sep))
+        sum_vec,stop_count=self.sum_vect_sent(sentence, sep,stopwords)
+        return  sum_vec/ (len(sentence.strip().split(sep))-stop_count)
+
+
