@@ -8,6 +8,7 @@
 from wv4tc.utils import load_dict
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+import pickle
 import pandas as pd
 import numpy as np
 from wv4tc.w2v import word2vec
@@ -34,7 +35,7 @@ def get_bow(data, stopwords, content_name, label_name):
         return count_vec, X_mat
     return count_vec, X_mat, data[label_name]
 
-def get_mean_vec(data,w2v, stopwords, content_name, label_name):
+def get_mean_vec(data,w2v, stopwords, content_name, label_name,pkl_path):
     """
     获得文本集的平均向量
     :param data: 文本集
@@ -47,9 +48,15 @@ def get_mean_vec(data,w2v, stopwords, content_name, label_name):
         logging.error("非法向量词典")
     contents=data[content_name]
     data_vec=[w2v.mean_vect_sent(content," ",stopwords) for content in contents]
-    return w2v,np.array(data_vec),data[label_name]
+    data_vec=np.array(data_vec)
+    if pkl_path is not None:
+        with open(pkl_path,"wb") as fw:
+            labels=data[label_name].values
+            labels=np.reshape(labels,(len(labels),1))
+            pickle.dump(np.append(data_vec,labels,axis=1))
+    return w2v,data_vec,data[label_name]
 
-def get_sum_vec(data,w2v, stopwords, content_name, label_name):
+def get_sum_vec(data,w2v, stopwords, content_name, label_name,pkl_path):
     """
     获得文本集的和向量
     :param data: 文本集
@@ -62,6 +69,12 @@ def get_sum_vec(data,w2v, stopwords, content_name, label_name):
         logging.error("非法向量词典")
     contents=data[content_name]
     data_vec=[w2v.sum_vect_sent(content," ",stopwords) for content in contents]
+    data_vec=np.array(data_vec)
+    if pkl_path is not None:
+        with open(pkl_path,"wb") as fw:
+            labels=data[label_name].values
+            labels=np.reshape(labels,(len(labels),1))
+            pickle.dump(np.append(data_vec,labels,axis=1))
     return w2v,np.array(data_vec),data[label_name]
 
 def get_tfidf(data, stopwords, content_name, label_name):
