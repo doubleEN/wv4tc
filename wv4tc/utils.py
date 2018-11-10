@@ -4,6 +4,8 @@
 # author:jxm_2@hotmail.com
 # datetime:2018/11/3
 
+import pandas as pd
+
 def sbc2dbc(str):
     """
     全角转半角
@@ -49,3 +51,11 @@ def load_dict(dict_path, decoding="utf8"):
     加载文本词典，文本词典一行一个词，得到词集。
     """
     return {word.strip() for word in open(dict_path, "r", encoding=decoding) if not word.startswith("#")}
+
+
+def load_data(data_path, decoding="utf8"):
+    """
+    加载语料，语料一行一个样本，分割为 content，label两个字段
+    :return: DataFrame对象
+    """
+    return pd.read_table(data_path, sep="\t", header=None, names=["content", "label"], encoding=decoding)
