@@ -7,6 +7,7 @@
 
 import logging
 from wv4tc.feature_text import get_bow, stop_words
+from wv4tc.utils import load_data
 import pandas as pd
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import *
@@ -21,16 +22,20 @@ logging.basicConfig(
     filemode='a')
 
 
-def tuning(train_path, test_path, model, tuned_parameters, scores, cv=5, n_jobs=-1):
+def tuning(train_data, test_data, model, tuned_parameters, scores, cv=5, n_jobs=-1):
     logging.info("---------------------------cut_off_begin--------------------------------")
     logging.info("TUNING function.")
-    train_data = pd.read_table(train_path, sep="\t", header=None, names=["content", "label"])
-    test_data = pd.read_table(test_path, sep="\t", header=None, names=["content", "label"])
+
+    if isinstance(train_data,str) and isinstance(test_data,str):
+        logging.info("<load " + train_data + " and " + test_data + ">")
+        train_data = load_data(train_data, "utf8")
+        test_data = load_data(test_data, "utf8")
+    else:
+        logging.info("<loading train data size:" + str(train_data.shape) + " and loading test data size:" + str(test_data.shape) + ">")
     all_data = pd.concat([train_data, test_data])
     doc_term, data_X, data_Y = get_bow(all_data, stop_words, content_name="content", label_name="label")
     boundary = len(train_data)
 
-    logging.info("<load " + train_path + " and " + test_path + ">")
     logging.info("cv:" + str(cv))
     logging.info("tuned_parameters:" + str(tuned_parameters))
     logging.info(type(model))

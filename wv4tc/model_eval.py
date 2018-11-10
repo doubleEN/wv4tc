@@ -9,6 +9,7 @@ import pandas as pd
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report
 from wv4tc.feature_text import get_bow, stop_words
+from wv4tc.utils import load_data
 import pickle
 import os
 import jieba
@@ -46,23 +47,17 @@ def save_model(model, transfer, pkl_path):
     logging.info("序列化完成")
 
 
-def load_data(data_path, decoding="utf8"):
-    """
-    加载语料，语料一行一个样本，分割为 content，label两个字段
-    :return: DataFrame对象
-    """
-    return pd.read_table(data_path, sep="\t", header=None, names=["content", "label"], encoding=decoding)
-
-
-def eval_model(train_data_path, test_data_path, model, pkl_path):
+def eval_model(train_data, test_data, model, pkl_path):
     """
     模型测试
     """
     logging.info("TEST function.")
-
-    logging.info("<load " + train_data_path + " and " + test_data_path + ">")
-    train_data = load_data(train_data_path)
-    test_data = load_data(test_data_path)
+    if isinstance(train_data,str) and isinstance(test_data,str):
+        logging.info("<load " + train_data + " and " + test_data + ">")
+        train_data = load_data(train_data)
+        test_data = load_data(test_data)
+    else:
+        logging.info("<loading train data size:" + str(train_data.shape) + " and loading test data size:" + str(test_data.shape) + ">")
     boundary = len(train_data)
     all_data = pd.concat([train_data, test_data])
     doc_term, data_X, data_Y = get_bow(all_data, stop_words, content_name="content", label_name="label")
