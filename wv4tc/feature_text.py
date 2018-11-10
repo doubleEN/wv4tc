@@ -9,6 +9,11 @@ from wv4tc.utils import load_dict
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 import pandas as pd
+import numpy as np
+from wv4tc.w2v import word2vec
+import logging
+
+logging.basicConfig(level=logging.ERROR)
 
 stop_words = load_dict("../data/stopwords.txt")
 
@@ -29,6 +34,35 @@ def get_bow(data, stopwords, content_name, label_name):
         return count_vec, X_mat
     return count_vec, X_mat, data[label_name]
 
+def get_mean_vec(data,w2v, stopwords, content_name, label_name):
+    """
+    获得文本集的平均向量
+    :param data: 文本集
+    :param w2v: word2vec对象
+    :param stopwords: 停用词
+    :param content_name: 训练文本
+    :param label_name: 训练label
+    """
+    if not isinstance(w2v,word2vec):
+        logging.error("非法向量词典")
+    contents=data[content_name]
+    data_vec=[w2v.mean_vect_sent(content," ",stopwords) for content in contents]
+    return w2v,np.array(data_vec),data[label_name]
+
+def get_sum_vec(data,w2v, stopwords, content_name, label_name):
+    """
+    获得文本集的和向量
+    :param data: 文本集
+    :param w2v: word2vec对象
+    :param stopwords: 停用词
+    :param content_name: 训练文本
+    :param label_name: 训练label
+    """
+    if not isinstance(w2v,word2vec):
+        logging.error("非法向量词典")
+    contents=data[content_name]
+    data_vec=[w2v.sum_vect_sent(content," ",stopwords) for content in contents]
+    return w2v,np.array(data_vec),data[label_name]
 
 def get_tfidf(data, stopwords, content_name, label_name):
     """
