@@ -22,7 +22,7 @@ class word2vec():
             if len(parts) != dim + 1:
                 print(line.strip() + "不能解析为一个向量对")
                 continue
-            self.w2v_dict[parts[0]] = np.array(parts[1:]).astype(np.float32)
+            self.w2v_dict[parts[0]] = np.array(parts[1:]).astype(np.float64)
         self.word_dict = self.w2v_dict.keys()
 
     def get_vec(self, word):
@@ -34,7 +34,7 @@ class word2vec():
             return 0.0
         return self.w2v_dict[word]
 
-    def sum_vect_sent(self, sentence, sep, stopwords=[]):
+    def sum_vect_sent(self, sentence, sep=" ", stopwords=[]):
         """
         词向量求和得句子向量
         :param sentence: 句子字符串
@@ -51,9 +51,10 @@ class word2vec():
                 sum_vec += self.get_vec(token)
             else:
                 stop_count += 1
+                print("过滤停用词：" + token)
         return sum_vec, stop_count
 
-    def mean_vect_sent(self, sentence, sep, stopwords=[]):
+    def mean_vect_sent(self, sentence, sep=" ", stopwords=[]):
         """
         词向量求均值得句子向量
         :param sentence: 句子字符串
@@ -61,4 +62,7 @@ class word2vec():
         :return: 句子向量
         """
         sum_vec, stop_count = self.sum_vect_sent(sentence, sep, stopwords)
+        if (len(sentence.strip().split(sep)) - stop_count) == 0:
+            print(sentence + " >>> 已分割过滤")
+            return 0.0
         return sum_vec / (len(sentence.strip().split(sep)) - stop_count)
