@@ -29,7 +29,7 @@ def get_bow(data, stopwords, content_name, label_name):
     return count_vec, X_mat, data[label_name]
 
 
-def get_mean_vec(data, w2v, stopwords, content_name, label_name, pkl_path):
+def save_mean_vec(data, w2v, stopwords, content_name, label_name, pkl_path):
     """
     获得文本集的平均向量
     :param data: 文本集
@@ -41,18 +41,13 @@ def get_mean_vec(data, w2v, stopwords, content_name, label_name, pkl_path):
     if not isinstance(w2v, word2vec):
         print("非法向量词典")
         return
-    contents = data[content_name]
-    data_vec = [w2v.mean_vect_sent(content, " ", stopwords) for content in contents]
-    data_vec = np.array(data_vec)
-    if pkl_path is not None:
-        with open(pkl_path, "wb") as fw:
-            labels = data[label_name].values
-            labels = np.reshape(labels, (len(labels), 1))
-            pickle.dump(np.append(data_vec, labels, axis=1))
-    return w2v, data_vec, data[label_name]
+    with open(pkl_path, "w", encoding="utf8") as fw:
+        for _, sample in data.iterrows():
+            sent_vec = w2v.mean_vect_sent(sample[content_name], " ", stopwords)
+            fw.write(" ".join(sent_vec.astype(np.str)) + "\t" + sample[label_name] + "\n")
 
 
-def get_sum_vec(data, w2v, stopwords, content_name, label_name, pkl_path):
+def save_sum_vec(data, w2v, stopwords, content_name, label_name, pkl_path):
     """
     获得文本集的和向量
     :param data: 文本集
@@ -64,15 +59,10 @@ def get_sum_vec(data, w2v, stopwords, content_name, label_name, pkl_path):
     if not isinstance(w2v, word2vec):
         print("非法向量词典")
         return
-    contents = data[content_name]
-    data_vec = [w2v.sum_vect_sent(content, " ", stopwords) for content in contents]
-    data_vec = np.array(data_vec)
-    if pkl_path is not None:
-        with open(pkl_path, "wb") as fw:
-            labels = data[label_name].values
-            labels = np.reshape(labels, (len(labels), 1))
-            pickle.dump(np.append(data_vec, labels, axis=1))
-    return w2v, np.array(data_vec), data[label_name]
+    with open(pkl_path, "w", encoding="utf8") as fw:
+        for _, sample in data.iterrows():
+            sent_vec, _ = w2v.sum_vect_sent(sample[content_name], " ", stopwords)
+            fw.write(" ".join(sent_vec.astype(np.str)) + "\t" + sample[label_name] + "\n")
 
 
 def get_tfidf(data, stopwords, content_name, label_name):
