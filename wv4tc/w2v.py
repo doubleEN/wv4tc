@@ -48,11 +48,13 @@ class word2vec():
         tokens = sentence.strip().split(sep)
         stop_count = 0
         for token in tokens:
+            if token.strip() == "":
+                continue
             if token not in stopwords:
                 sum_vec += self.get_vec(token)
             else:
                 stop_count += 1
-                print("过滤停用词：" + token)
+                # print("过滤停用词：" + token)
         if isinstance(sum_vec, float):
             return np.zeros(shape=(self.dim)), stop_count
         return sum_vec, stop_count
