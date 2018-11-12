@@ -7,14 +7,12 @@
 
 import os
 import re
-from wv4tc.utils import load_SC,sbc2dbc,dbc2sbc
-import logging
+from wv4tc.utils import load_SC, sbc2dbc
 
 sohu_invalid_count = 0
 sohu_sum = 0
 valid_count = 0
 
-logging.basicConfig(level=logging.DEBUG)
 
 def clean_text(text):
     """
@@ -37,7 +35,7 @@ def doc_fudan(corpus_path, encoding="gb18030"):
     """
     file_names = os.listdir(corpus_path)
     for file in file_names:
-        logging.debug("加载文档目录 " + file)
+        print("加载文档目录 " + file)
         label = file[file.index("-") + 1:]
         for doc in os.listdir(corpus_path + "/" + file):
             text = open(corpus_path + "/" + file + "/" + doc, "r", encoding=encoding, errors="ignore").read().strip()
@@ -52,13 +50,13 @@ def doc_easenet(corpus_path, encoding="utf8"):
     :return:content\tlabel
     """
     if not os.path.exists(corpus_path):
-        logging.error("corpus_path 无效")
+        print("corpus_path 无效")
         return
     file_names = os.listdir(corpus_path)
     for file in file_names:
         label = file[:file.index("_")]
         text = open(corpus_path + "/" + file, "r", encoding=encoding, errors="ignore").read().strip()
-        logging.debug(file + " 加载完成")
+        print(file + " 加载完成")
         yield clean_text(text) + "\t" + label
 
 
@@ -72,21 +70,21 @@ def parse_sohu_xml(xml_str):
     sohu_sum += 1
     label_match = re.search("//(.*?)\\.sohu\\.com", xml_str)
     if label_match is None or label_match.group(1).strip() == "":
-        logging.info(xml_str + "#### label 无法被解析")
+        print(xml_str + "#### label 无法被解析")
         sohu_invalid_count += 1
         return
     label = label_match.group(1).strip()
 
     title_match = re.search("<contenttitle>(.*?)</contenttitle>", xml_str)
     if title_match is None or title_match.group(1).strip() == "":
-        logging.info(xml_str + "#### title无法被解析")
+        print(xml_str + "#### title无法被解析")
         sohu_invalid_count += 1
         return
     title = title_match.group(1).strip()
 
     content_match = re.search("<content>(.*?)</content>", xml_str)
     if content_match is None or content_match.group(1).strip() == "":
-        logging.info(xml_str + "#### content 无法被解析")
+        print(xml_str + "#### content 无法被解析")
         sohu_invalid_count += 1
         return
     content = content_match.group(1).strip()
@@ -125,13 +123,11 @@ def format_doc(corpus_generator, corpus_path, out_path, r_encoding, w_encoding="
     :param w_mode:写模式
     """
     if out_path and not w_encoding or not out_path and w_encoding:
-        logging.error("参数 out_path、w_encoding 形式不合法。")
+        print("参数 out_path、w_encoding 形式不合法。")
         return
     global valid_count
     with open(out_path, mode=w_mode, encoding=w_encoding) as fw:
         for doc in corpus_generator(corpus_path, r_encoding):
             fw.write(doc + "\n")
             valid_count += 1
-    logging.debug("有效格式化文本数：" + str(valid_count))
-
-
+    print("有效格式化文本数：" + str(valid_count))

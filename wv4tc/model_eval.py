@@ -6,16 +6,15 @@
 # desc: 评估模型
 
 import pandas as pd
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import classification_report
-from wv4tc.feature_text import get_bow, stop_words
+from sklearn.metrics import *
+from wv4tc.feature_text import get_bow
 from wv4tc.utils import load_data
 import pickle
 import os
 import jieba
 import logging
 
-log_file = "../log/easenet_test.log"
+log_file = "../log/test.log"
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -34,30 +33,33 @@ def save_model(model, transfer, pkl_path):
     :param pkl_path: 序列化路径，以/结尾
     """
     if not os.path.exists(pkl_path):
-        logging.error("路径不存在")
+        print("路径不存在")
         return
+    if not pkl_path.endswith("/") or not pkl_path.endswith("\\"):
+        pkl_path += "/"
     m_path = pkl_path + "model.pkl"
     transfer_path = pkl_path + "transfer.pkl"
 
-    logging.info("序列化... ")
+    print("序列化... ")
     with open(m_path, "wb") as fw:
         pickle.dump(model, fw)
     with open(transfer_path, "wb") as fw:
         pickle.dump(transfer, fw)
-    logging.info("序列化完成")
+    print("序列化完成")
 
 
-def eval_model(train_data, test_data, model, pkl_path):
+def eval_model(train_data, test_data, model, pkl_path, stop_words):
     """
     模型测试
     """
     logging.info("TEST function.")
-    if isinstance(train_data,str) and isinstance(test_data,str):
+    if isinstance(train_data, str) and isinstance(test_data, str):
         logging.info("<load " + train_data + " and " + test_data + ">")
         train_data = load_data(train_data)
         test_data = load_data(test_data)
     else:
-        logging.info("<loading train data size:" + str(train_data.shape) + " and loading test data size:" + str(test_data.shape) + ">")
+        logging.info("<loading train data size:" + str(train_data.shape) + " and loading test data size:" + str(
+            test_data.shape) + ">")
     boundary = len(train_data)
     all_data = pd.concat([train_data, test_data])
     doc_term, data_X, data_Y = get_bow(all_data, stop_words, content_name="content", label_name="label")
@@ -70,13 +72,19 @@ def eval_model(train_data, test_data, model, pkl_path):
     test_X = data_X[boundary:]
     test_Y = data_Y[boundary:]
 
+    logging.info("building...")
     model.fit(train_X, train_Y)
+    logging.info("building finished.")
 
-    if pkl_path:
+    if pkl_path is not None:
         save_model(model, doc_term, pkl_path)
 
     y_true, y_pred = test_Y, model.predict(test_X)
     res = classification_report(y_true, y_pred)
+    logging.info(res)
+    res = precision_recall_fscore_support(y_true, y_pred)
+    logging.info(res)
+    res = confusion_matrix(y_true, y_pred)
     logging.info(res)
     logging.info("<<<[tuning end]>>>\n")
 
@@ -92,7 +100,7 @@ def load_model(model_path):
     m_path = model_path + "model.pkl"
     transfer_path = model_path + "transfer.pkl"
     if not os.path.exists(m_path) or not os.path.exists(transfer_path):
-        logging.error("模型路径非法")
+        print("模型路径非法")
         return
     with open(m_path, "rb") as fr:
         model = pickle.load(fr)
