@@ -17,6 +17,7 @@ class word2vec():
         :param decoding: 解码
         '''
         self.w2v_dict = {}
+        self.dim = dim
         for line in open(w2v_path, "r", encoding=decoding):
             parts = line.strip().split(" ")
             if len(parts) != dim + 1:
@@ -31,7 +32,7 @@ class word2vec():
         """
         if word not in self.word_dict:
             print(word + " 不存在于向量词典中")
-            return 0.0
+            return np.zeros(shape=(self.dim))
         return self.w2v_dict[word]
 
     def sum_vect_sent(self, sentence, sep=" ", stopwords=[]):
@@ -42,7 +43,7 @@ class word2vec():
         :return: (句子向量，停用词命中数)
         """
         if sentence == None or sentence.strip() == "":
-            return 0
+            return np.zeros(shape=(self.dim))
         sum_vec = 0.0
         tokens = sentence.strip().split(sep)
         stop_count = 0
@@ -52,6 +53,8 @@ class word2vec():
             else:
                 stop_count += 1
                 print("过滤停用词：" + token)
+        if isinstance(sum_vec, float):
+            return np.zeros(shape=(self.dim)), stop_count
         return sum_vec, stop_count
 
     def mean_vect_sent(self, sentence, sep=" ", stopwords=[]):
@@ -64,5 +67,5 @@ class word2vec():
         sum_vec, stop_count = self.sum_vect_sent(sentence, sep, stopwords)
         if (len(sentence.strip().split(sep)) - stop_count) == 0:
             print(sentence + " >>> 已分割过滤")
-            return 0.0
+            return np.zeros(shape=(self.dim))
         return sum_vec / (len(sentence.strip().split(sep)) - stop_count)
