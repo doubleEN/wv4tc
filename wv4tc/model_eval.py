@@ -8,7 +8,7 @@
 import pandas as pd
 from sklearn.metrics import *
 from wv4tc.feature_text import get_bow
-from wv4tc.utils import load_data
+from wv4tc.utils import load_data, sbc2dbc
 import pickle
 import os
 import jieba
@@ -130,6 +130,7 @@ def seg_predict(doc, model_path, model=None, transfer=None):
     对字符串文本分词并预测
     :param doc:a str or a list，待预测的文本
     """
+    doc = sbc2dbc(doc)
     if isinstance(doc, str):
         doc_arr = [" ".join(jieba.lcut(doc))]
         return predict(doc_arr, model_path, model=None, transfer=None)
