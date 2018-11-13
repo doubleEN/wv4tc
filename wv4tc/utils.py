@@ -5,6 +5,7 @@
 # datetime:2018/11/3
 
 import pandas as pd
+import numpy as np
 
 
 def sbc2dbc(str):
@@ -60,3 +61,26 @@ def load_data(data_path, decoding="utf8"):
     :return: DataFrame对象
     """
     return pd.read_table(data_path, sep="\t", header=None, names=["content", "label"], encoding=decoding)
+
+
+def load_vecs(vec_path, decoding="utf8"):
+    """
+    加载文本向量集，格式：vec\tlabel。向量值单空格分割
+    """
+    data_set = []
+    labels = []
+    for line in open(vec_path, "r", encoding=decoding):
+        line = line.strip()
+        if line == "":
+            continue
+        data, label = line.split("\t")
+        data = list(np.array(data.split(" ")).astype(np.float64))
+        data_set.append(data)
+        labels.append(label)
+    return np.array(data_set), np.array(labels)
+
+
+if __name__ == "__main__":
+    x, y = load_vecs("../data/texts_vec")
+    print(x.shape)
+    print(y.shape)
